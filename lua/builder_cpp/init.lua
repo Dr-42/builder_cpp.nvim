@@ -26,7 +26,16 @@ local function cmd_run(cmd)
 	vim.fn.jobstart(cmd, {
 		on_stdout = function(_, data)
 			vim.fn.append(vim.fn.line('$'), data)
-		end
+		end,
+		on_stderr = function(_, data)
+			vim.fn.append(vim.fn.line('$'), data)
+		end,
+		on_exit = function(_, data, _)
+			vim.fn.append(vim.fn.line('$'), data)
+			vim.defer_fn(function()
+				vim.api.nvim_win_close(win, true)
+			end, 4000)
+		end,
 	})
 end
 
