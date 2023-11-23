@@ -28,10 +28,10 @@ local function cmd_run(cmd)
 		return
 	end
 	vim.fn.jobstart(cmd, {
-		on_stdout = function(_, data, _)
+		on_stdout = function(_, data)
 			vim.api.nvim_chan_send(term_channel, data)
 		end,
-		on_stderr = function(_, data, _)
+		on_stderr = function(_, data)
 			vim.fn.chansend(term_channel, data)
 		end,
 		on_exit = function(_, _, _)
