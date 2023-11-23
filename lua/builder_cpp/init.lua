@@ -23,15 +23,19 @@ local function cmd_run(cmd)
 	local win = vim.api.nvim_open_win(buf, true, opts)
 	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
 	vim.api.nvim_win_set_option(win, "winblend", 0)
+	local term_channel = vim.api.nvim_open_term(buf, {})
+	if term_channel == 0 then
+		return
+	end
 	vim.fn.jobstart(cmd, {
-		on_stdout = function(_, data)
-			vim.fn.append(vim.fn.line('$'), data)
+		on_stdout = function(_, data, _)
+			vim.api.nvim_chan_send(term_channel, data)
 		end,
-		on_stderr = function(_, data)
-			vim.fn.append(vim.fn.line('$'), data)
+		on_stderr = function(_, data, _)
+			vim.fn.chansend(term_channel, data)
 		end,
-		on_exit = function(_, data, _)
-			vim.fn.append(vim.fn.line('$'), data)
+		on_exit = function(_, _, _)
+			vim.fn.chansend(term_channel, "exit")
 			vim.defer_fn(function()
 				vim.api.nvim_win_close(win, true)
 			end, 4000)
