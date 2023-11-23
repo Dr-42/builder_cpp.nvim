@@ -24,9 +24,6 @@ local function cmd_run(cmd)
 	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
 	vim.api.nvim_win_set_option(win, "winblend", 0)
 	local term_channel = vim.api.nvim_open_term(buf, {})
-	if term_channel == 0 then
-		return
-	end
 	vim.fn.jobstart(cmd, {
 		on_stdout = function(_, data)
 			vim.api.nvim_chan_send(term_channel, data)
